@@ -18,7 +18,10 @@ const config = {
 			fallback: undefined,
 			precompress: false,
 			strict: true
-		})
+		}),
+		paths: {
+			base: process.env.NODE_ENV === 'production' ? '/SvStocks' : ''  // Replace 'repo-name' with your actual repo name
+		},
 	}
 };
 
