@@ -1,0 +1,43 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to main branch
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4  # Checks out your repo
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20  # Use a stable LTS version (adjust if needed)
+          cache: 'npm'  # Cache dependencies for faster builds
+
+      - name: Install dependencies
+        run: npm ci  # Or 'npm install' if you prefer
+
+      - name: Build the app
+        run: npm run build  # Runs SvelteKit build (outputs to build/)
+
+      - name: Add .nojekyll file
+        run: touch build/.nojekyll  # Prevents Jekyll interference
+
+      - name: Deploy to GitHub Pages
+        uses: jamesives/github-pages-deploy-action@v4.6.3  # Reliable action for deploying to gh-pages
+        with:
+          folder: build  # The folder to deploy (SvelteKit's static output)
+          branch: gh-pages  # Target branch for GitHub Pages
+          token: ${{ secrets.GITHUB_TOKEN }}  # Built-in token for auth
+          clean: true  # Clean up old files on the branch
